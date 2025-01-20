@@ -1,5 +1,6 @@
 {
   "dependencies": {
+<<<<<<< Updated upstream
     "com.unity.2d.animation": {
       "version": "9.1.2",
       "depth": 1,
@@ -275,6 +276,8 @@
       },
       "url": "https://packages.unity.com"
     },
+=======
+>>>>>>> Stashed changes
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
