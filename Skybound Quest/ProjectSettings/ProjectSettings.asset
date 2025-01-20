@@ -670,12 +670,12 @@ PlayerSettings:
   hmiLogStartupTiming: 0
   hmiCpuConfiguration: 
   apiCompatibilityLevel: 6
-  activeInputHandler: 0
+  activeInputHandler: 2
   windowsGamepadBackendHint: 0
   cloudProjectId: 4f87d9b3-2318-40c8-8d1a-efe46b305938
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: My project
+  projectName: Skybound Quest
   organizationId: hazar-bakir
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
