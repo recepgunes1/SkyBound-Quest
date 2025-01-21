@@ -8,9 +8,13 @@ public class PlayerController : MonoBehaviour
     public float jumpVelocity;
     [SerializeField] private float moveSpeed = 5f;
     private float moveInput;
-
     private Rigidbody2D rb;
     public float currentSpeed;
+    
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.2f;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private bool isGrounded;
 
     private void Awake()
     {
@@ -26,8 +30,10 @@ public class PlayerController : MonoBehaviour
         }
 
         moveInput = Input.GetAxisRaw("Horizontal");
+        
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.Period) && isGrounded)
         {
             Jump();
         }
@@ -50,7 +56,7 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
         }
-        else if (rb.velocity.y > 0 && !(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)))
+        else if (rb.velocity.y > 0 && !(Input.GetKey(KeyCode.Period)))
         {
             rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
         }
@@ -60,16 +66,23 @@ public class PlayerController : MonoBehaviour
     {
         if (moveInput != 0)
         {
-            rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y); // Instant response to input
+            rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
         }
         else
         {
-            rb.velocity = new Vector2(0, rb.velocity.y); // Stop horizontal movement immediately
+            rb.velocity = new Vector2(0, rb.velocity.y);
         }
     }
 
     float GetCurrentSpeed()
     {
         return rb.velocity.x;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (groundCheck == null) return;
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }
