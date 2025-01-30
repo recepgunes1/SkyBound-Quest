@@ -74,12 +74,12 @@ In a world sustained by an ancient core that keeps its islands afloat, disaster 
 3. Click the **Add** button.
 ![image](https://github.com/user-attachments/assets/35813848-4002-4e87-bc8b-cbdfa355dd91)
 4. Find your cloned repository
+5. Open **SkyBound-Quest** folder
 ![image](https://github.com/user-attachments/assets/672eef35-e935-447f-b067-1fc480b63ae2)
-5. Open "SkyBound-Quest folder
-6. ![image](https://github.com/user-attachments/assets/73a7f310-5406-4d9d-9130-52cb41fdaf03)
+7. Choose **SkyboundQuest**
+8. Click **Open** button down below
+![image](https://github.com/user-attachments/assets/73a7f310-5406-4d9d-9130-52cb41fdaf03)
 **And that's all! Now you can install the required version and start contributing!**
 
----
-
-After developing the game, we will share all contributors at the **end of the game (credits)** and the **ReadMe page**. _Thank you, future devs✨!_
-- Feel free to open issues or contribute via pull requests✌️.  
+**After developing the game, we will share all contributors at the **end of the game (credits)** and the **ReadMe page**. _Thank you, future devs✨!_**
+- Feel free to open issues or contribute via pull requests✨.  
