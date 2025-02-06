@@ -1,7 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,7 +9,9 @@ public class PlayerController : MonoBehaviour
     public float jumpVelocity;
 
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float climbSpeed = 3f;
     private float _moveInput;
+    private float _climbInput;
     private Rigidbody2D _rb;
     public float currentSpeed;
 
@@ -30,6 +31,8 @@ public class PlayerController : MonoBehaviour
     private bool _isDashing;
     private bool _canDash = true;
 
+    [SerializeField] private bool isClimbing;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -38,6 +41,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _moveInput = Input.GetAxisRaw("Horizontal");
+        _climbInput = Input.GetAxisRaw("Vertical");
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
         isTouchingWall = Physics2D.OverlapBox(wallCheck.position, wallCheckSize, 0, groundLayer);
 
@@ -51,6 +55,15 @@ public class PlayerController : MonoBehaviour
             StartDash();
         }
 
+        if (_climbInput is > 0 or < 0 && isTouchingWall)
+        {
+            isClimbing = true;
+        }
+        else if (!isTouchingWall || Input.GetAxisRaw("Vertical") == 0)
+        {
+            isClimbing = false;
+        }
+
         if (isGrounded && !_isDashing)
         {
             _canDash = true;
@@ -59,11 +72,24 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!_isDashing)
+        if (_isDashing) return;
+
+        if (isClimbing)
         {
-            Run();
-            SetJumpFallSpeed();
+            Climb();
         }
+        else
+        {
+            _rb.gravityScale = 1;
+        }
+        Run();
+        SetJumpFallSpeed();
+    }
+
+    private void Climb()
+    {
+        _rb.velocity = new Vector2(_climbInput * -_rb.velocity.x, climbSpeed);
+        _rb.gravityScale = 0;
     }
 
     private void StartDash()
@@ -75,7 +101,7 @@ public class PlayerController : MonoBehaviour
 
         if (_dashDirection == Vector2.zero)
         {
-            _dashDirection = new Vector2(transform.localScale.x, 0); // Default to horizontal dash
+            _dashDirection = new Vector2(transform.localScale.x, 0);
         }
 
         _dashDirection.Normalize();
@@ -99,27 +125,22 @@ public class PlayerController : MonoBehaviour
 
     private void SetJumpFallSpeed()
     {
-        if (_rb.velocity.y < 0)
+        switch (_rb.velocity.y)
         {
-            _rb.velocity += Vector2.up * (( Physics2D.gravity.y * (fallMultiplier - 1)) * Time.fixedDeltaTime);
-        }
-        else if (_rb.velocity.y > 0 && !(Input.GetKey(KeyCode.Period)))
-        {
-            _rb.velocity += Vector2.up * ((Physics2D.gravity.y * (lowJumpMultiplier - 1)) * Time.fixedDeltaTime);
-
+            case < 0:
+                _rb.velocity += Vector2.up * ((Physics2D.gravity.y * (fallMultiplier - 1)) * Time.fixedDeltaTime);
+                break;
+            case > 0 when !(Input.GetKey(KeyCode.Period)):
+                _rb.velocity += Vector2.up * ((Physics2D.gravity.y * (lowJumpMultiplier - 1)) * Time.fixedDeltaTime);
+                break;
         }
     }
 
     private void Run()
     {
-        if (_moveInput != 0)
-        {
-            _rb.velocity = new Vector2(_moveInput * moveSpeed, _rb.velocity.y);
-        }
-        else
-        {
-            _rb.velocity = new Vector2(0, _rb.velocity.y);
-        }
+        _rb.velocity = _moveInput != 0
+            ? new Vector2(_moveInput * moveSpeed, _rb.velocity.y)
+            : new Vector2(0, _rb.velocity.y);
     }
 
     private void OnDrawGizmos()
