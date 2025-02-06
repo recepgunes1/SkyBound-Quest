@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 4294279874955734672}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.1890609, y: -0.28853586, z: 0.0026999605}
+  m_LocalPosition: {x: 0, y: -0.529, z: 0}
   m_LocalScale: {x: 2.2407622, y: 1.3508223, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -39,7 +39,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4294279874955734672}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -64,7 +64,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.083978325, y: -0.14720654}
+  m_Offset: {x: 0.0024826527, y: 0.04522443}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -75,7 +75,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.4438247, y: 0.016658306}
+  m_Size: {x: 0.3, y: 0.021073818}
   m_EdgeRadius: 0
 --- !u!1 &6617924860898316157
 GameObject:
@@ -111,6 +111,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2137856923179198712}
+  - {fileID: 8202370632587097043}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1158672865330590285
@@ -204,11 +205,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff9a84a6c3ed6c4d9ce9dfce8f44eb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallMultiplier: 2.5
-  lowJumpMultiplier: 2.5
-  jumpVelocity: 12
-  moveSpeed: 8.5
+  fallMultiplier: 4
+  lowJumpMultiplier: 4
+  jumpVelocity: 15
+  moveSpeed: 5
   currentSpeed: 0
+  groundCheck: {fileID: 2137856923179198712}
+  wallCheck: {fileID: 8202370632587097043}
+  groundCheckRadius: 0.05
+  wallCheckSize: {x: 0.11, y: 0.6}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  isGrounded: 0
+  isTouchingWall: 0
+  dashVelocity: 15
+  dashTime: 0.1
 --- !u!70 &1916778508246000842
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -241,6 +253,37 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 0.99999994}
+  m_Offset: {x: 0, y: 0.003076811}
+  m_Size: {x: 1, y: 0.99384624}
   m_Direction: 0
+--- !u!1 &8191817820935840987
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8202370632587097043}
+  m_Layer: 0
+  m_Name: Wall Check
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8202370632587097043
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8191817820935840987}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.366, y: 0.091, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6159246869141144816}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

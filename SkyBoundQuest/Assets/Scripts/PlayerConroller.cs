@@ -1,75 +1,157 @@
-using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
 {
     public float fallMultiplier = 2.5f;
     public float lowJumpMultiplier = 2f;
     public float jumpVelocity;
-    [SerializeField] private float moveSpeed = 5f;
-    private float moveInput;
 
-    private Rigidbody2D rb;
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float climbSpeed = 3f;
+    private float _moveInput;
+    private float _climbInput;
+    private Rigidbody2D _rb;
     public float currentSpeed;
+
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private Transform wallCheck;
+    [SerializeField] private float groundCheckRadius = 0.2f;
+    [SerializeField] private Vector2 wallCheckSize;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private bool isGrounded;
+    [SerializeField] private bool isTouchingWall;
+
+    [Header("Dash Settings")] [SerializeField]
+    private float dashVelocity = 15f;
+
+    [SerializeField] private float dashTime = 0.1f;
+    private Vector2 _dashDirection;
+    private bool _isDashing;
+    private bool _canDash = true;
+
+    [SerializeField] private bool isClimbing;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
     {
-        currentSpeed = GetCurrentSpeed();
-        if (currentSpeed != 0)
-        {
-            Debug.Log("Current Speed: " + currentSpeed);
-        }
+        _moveInput = Input.GetAxisRaw("Horizontal");
+        _climbInput = Input.GetAxisRaw("Vertical");
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        isTouchingWall = Physics2D.OverlapBox(wallCheck.position, wallCheckSize, 0, groundLayer);
 
-        moveInput = Input.GetAxisRaw("Horizontal");
-
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.Period) && isGrounded)
         {
             Jump();
+        }
+
+        if (Input.GetButtonDown("Dash") && _canDash)
+        {
+            StartDash();
+        }
+
+        if (_climbInput is > 0 or < 0 && isTouchingWall)
+        {
+            isClimbing = true;
+        }
+        else if (!isTouchingWall || Input.GetAxisRaw("Vertical") == 0)
+        {
+            isClimbing = false;
+        }
+
+        if (isGrounded && !_isDashing)
+        {
+            _canDash = true;
         }
     }
 
     private void FixedUpdate()
     {
+        if (_isDashing) return;
+
+        if (isClimbing)
+        {
+            Climb();
+        }
+        else
+        {
+            _rb.gravityScale = 1;
+        }
         Run();
         SetJumpFallSpeed();
     }
 
-    void Jump()
+    private void Climb()
     {
-        rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
+        _rb.velocity = new Vector2(_climbInput * -_rb.velocity.x, climbSpeed);
+        _rb.gravityScale = 0;
     }
 
-    void SetJumpFallSpeed()
+    private void StartDash()
     {
-        if (rb.velocity.y < 0)
+        _isDashing = true;
+        _canDash = false;
+
+        _dashDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+        if (_dashDirection == Vector2.zero)
         {
-            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
+            _dashDirection = new Vector2(transform.localScale.x, 0);
         }
-        else if (rb.velocity.y > 0 && !(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)))
+
+        _dashDirection.Normalize();
+        _rb.velocity = _dashDirection * dashVelocity;
+
+        StartCoroutine(StopDash());
+    }
+
+    private IEnumerator StopDash()
+    {
+        yield return new WaitForSeconds(dashTime);
+        _isDashing = false;
+
+        _rb.velocity = new Vector2(0, _rb.velocity.y);
+    }
+
+    private void Jump()
+    {
+        _rb.velocity = new Vector2(_rb.velocity.x, jumpVelocity);
+    }
+
+    private void SetJumpFallSpeed()
+    {
+        switch (_rb.velocity.y)
         {
-            rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
+            case < 0:
+                _rb.velocity += Vector2.up * ((Physics2D.gravity.y * (fallMultiplier - 1)) * Time.fixedDeltaTime);
+                break;
+            case > 0 when !(Input.GetKey(KeyCode.Period)):
+                _rb.velocity += Vector2.up * ((Physics2D.gravity.y * (lowJumpMultiplier - 1)) * Time.fixedDeltaTime);
+                break;
         }
     }
 
-    void Run()
+    private void Run()
     {
-        if (moveInput != 0)
-        {
-            rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y); // Instant response to input
-        }
-        else
-        {
-            rb.velocity = new Vector2(0, rb.velocity.y); // Stop horizontal movement immediately
-        }
+        _rb.velocity = _moveInput != 0
+            ? new Vector2(_moveInput * moveSpeed, _rb.velocity.y)
+            : new Vector2(0, _rb.velocity.y);
     }
 
-    float GetCurrentSpeed()
+    private void OnDrawGizmos()
     {
-        return rb.velocity.x;
+        if (wallCheck == null) return;
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(wallCheck.position, wallCheckSize);
+        }
+        if (groundCheck == null) return;
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }
