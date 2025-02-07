@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float climbSpeed = 3f;
     private float _moveInput;
-    private float _climbInput;
+    public float _climbInput;
     private Rigidbody2D _rb;
     public float currentSpeed;
 
@@ -78,18 +78,13 @@ public class PlayerController : MonoBehaviour
         {
             Climb();
         }
-        else
-        {
-            _rb.gravityScale = 1;
-        }
         Run();
         SetJumpFallSpeed();
     }
 
     private void Climb()
     {
-        _rb.velocity = new Vector2(_climbInput * -_rb.velocity.x, climbSpeed);
-        _rb.gravityScale = 0;
+        _rb.velocity = new Vector2( _rb.velocity.x, _climbInput * climbSpeed);
     }
 
     private void StartDash()
